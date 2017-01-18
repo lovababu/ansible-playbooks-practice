@@ -16,13 +16,14 @@
 
     - name: Provision exactly two instance
       ec2:
-         key_name: "common-ec2-keypair"
+         key_name: "common-ec2-keypair-2"
          group: "{{ ec2_group }}"
          instance_type: "{{ instance_type }}"
          image: "{{ ami_id }}"
          region: "{{ region }}"
          wait: true
          assign_public_ip: no
+         vpc_subnet_id: "subnet-d00a65b4"
          count: 2
       register: ec2
 
@@ -54,18 +55,17 @@
 
 ## Play 2 Installing apache2 on Ec2, just launched.
 - name: Play 2 Inatall Apache
-  hosts: ec2hosts ansible_python_interpreter= /usr/bin/python3
-  gather_facts: True
+  hosts: ec2hosts
+  gather_facts: False
   become: True
   user: ubuntu
+  pre_tasks:
+    - name: 'install python2'
+      raw: sudo apt-get -y install python-simplejson
 
   vars:
     region : "ap-southeast-1"
     package_name: "apache2"
-    #ansible_python_interpreter: "/usr/bin/python3"
-
-  #environment:
-  #  ansible_python_interpreter: /usr/bin/python3
 
   tasks:
     - name: installing apache2.
@@ -95,7 +95,7 @@
   connection: local
   gather_facts: False
   become: False
-  
+
   vars:
     region: "ap-southeast-1"
     elb_group: "sap_elb_sec_group"
