@@ -1,0 +1,4 @@
+---
+# Main tasks.
+- include: launch_ec2_attachto_elb.py
+- include: setup_apache_ec2.py 

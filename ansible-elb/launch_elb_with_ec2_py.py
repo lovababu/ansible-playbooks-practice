@@ -1,5 +1,7 @@
-- name: Create Ec2 instance, Assign ElasticIP and Add to host group.
+---
+- name: Create Ec2 instance, Assign ElasticIP, Install Apache2 and add instance to elb.
   hosts: localhost
+  user: ubuntu
   connection: local
   gather_facts: False
   become: False
@@ -22,38 +24,39 @@
          region: "{{ region }}"
          wait: true
          assign_public_ip: no
-         #count: 2
-         exact_count: 2
-         count_tag:
-            Name: elb_bs
-         instance_tags:
-            Name: elb_bs
+         count: 2
+         #exact_count: 2
+         #count_tags:
+         #   AppServer: elbbs
       register: ec2
 
-    #### Adding just lauched ec2 to host group, this can be used in later plays to perfom some actions on ec2s.
-    - name: Add new instance to host group
-      add_host:
-        hostname: "{{ item.public_ip }}"
-        groupname: ec2hosts
+    - name: Add tags to Ec2 instances.
+      local_action:
+        module: ec2_tag
+        resource: "{{ item.id }}"
+        region: "{{ region }}"
+        state: "present"
+        tags:
+          Name: avoltest
+          Env: dev
       with_items: "{{ ec2.instances }}"
 
-- name: Install Apache2 on Ec2 just launched.
-  hosts: ec2hosts
-  gather_facts: False
-  become: True
-
-  tasks:
-    - name: install apache2.
-      apt: name=apache2 update_cache=yes state=latest
-
-- name: Attaching Elastic Ips to Ec2s.
-  hosts: localhost
-
-  tasks:
-    #### Assigning elastic ips to recently lauched ec2s.
     - name: associate new elastic IP for each instance.
       local_action:
         module: ec2_eip
         region: "{{ region }}"
         instance_id: "{{ item.id }}"
       with_items: "{{ ec2.instances }}"
+
+    #- name: Wait for SSH to become available.
+    #  pause: minutes=1
+
+#Installing Apache 2 on Ec2s just launched, using dynamic inventory.
+#- name: Install Apache2 on Ec2 just launched.
+#  hosts: tag_Env_dev
+#  user: ubuntu
+#  gather_facts: True
+#  become: True
+#  tasks:
+#    - name: install apache2.
+#      apt: name=apache2 update_cache=yes state=latest
