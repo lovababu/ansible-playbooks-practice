@@ -15,16 +15,17 @@
   tasks:
 
     - name: Provision exactly two instance
-      ec2:
-         key_name: "common-ec2-keypair-2"
-         group: "{{ ec2_group }}"
-         instance_type: "{{ instance_type }}"
-         image: "{{ ami_id }}"
-         region: "{{ region }}"
-         wait: true
-         assign_public_ip: no
-         vpc_subnet_id: "subnet-d00a65b4"
-         count: 2
+      local_action:
+        module: ec2
+        key_name: "common-ec2-keypair-2"
+        group: "{{ ec2_group }}"
+        instance_type: "{{ instance_type }}"
+        image: "{{ ami_id }}"
+        region: "{{ region }}"
+        wait: true
+        assign_public_ip: no
+        vpc_subnet_id: "subnet-d00a65b4"
+        count: 2
       register: ec2
 
     - name: Add tags to Ec2 instances.
@@ -54,7 +55,7 @@
       with_items: "{{ ec2.instances }}"
 
 ## Play 2 Installing apache2 on Ec2, just launched.
-- name: Play 2 Inatall Apache
+- name: Play 2 Install Apache 2 on ec2hosts
   hosts: ec2hosts
   gather_facts: False
   become: True
@@ -74,7 +75,7 @@
 ## Play 3, Creating Elastic Ips and associating with Ec2 just launched.
 - name: Play 3 Associate new elastice ips to ec2.
   hosts: localhost
-  connection: local
+  #connection: local
   gather_facts: False
   become: False
 
@@ -92,7 +93,7 @@
 ## Play 4 Creatin ELB and attaching Ec2 ids to ELB.
 - name: Play 4 Creating ELB and attach Ec2.
   hosts: localhost
-  connection: local
+  #connection: local
   gather_facts: False
   become: False
 
