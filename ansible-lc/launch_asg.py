@@ -6,7 +6,7 @@
   become: False
 
   vars:
-    ami_id : "ami-06963965"
+    ami_id : "ami-4dd6782e"
     ec2_group : "sg-628d5505"
     region : "ap-southeast-1"
     group : "default"
@@ -42,10 +42,19 @@
         #user data, it can be a shell scritp get executed once machine spin up.
         user_data: |
                    #!/bin/bash
-                   sudo apt-get update
-                   sudo apt-get install apache2
-                   hostname=$(hostname -f)
-                   echo '<h3>I am the instance $hostname</h3>' > /var/www/html/index.html
+                   yum update -y
+                   yum install -y httpd24
+                   service httpd start
+                   chkconfig httpd on
+                   groupadd www
+                   usermod -a -G www ec2-user
+                   chown -R root:www /var/www
+                   chmod 2775 /var/www
+                   find /var/www -type d -exec chmod 2775 {} +
+                   find /var/www -type f -exec chmod 0664 {} +
+                   OUTPUT="$(hostname -f)"
+                   echo "<h2> Response from ${OUTPUT} </h2>" > /var/www/html/index.html
+
     ## Create ELB.
     - name: Creating Elastic Load Balancer.
       local_action:
@@ -67,7 +76,7 @@
         health_check:
           ping_protocol: http # options are http, https, ssl, tcp
           ping_port: 80
-          ping_path: "/" # not required for tcp or ssl
+          ping_path: "/index.html" # not required for tcp or ssl
           response_timeout: 5 # seconds
           interval: 30 # seconds
           unhealthy_threshold: 2
