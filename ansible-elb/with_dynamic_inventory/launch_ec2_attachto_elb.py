@@ -2,7 +2,7 @@
 - name: Play 1 creating two Ec2 instances.
   hosts: localhost
   user: ubuntu
-  connection: local
+  #connection: local
   gather_facts: False
   become: False
 
@@ -54,26 +54,8 @@
         state: started
       with_items: "{{ ec2.instances }}"
 
-## Play 2 Installing apache2 on Ec2, just launched.
-- name: Play 2 Install Apache 2 on ec2hosts
-  hosts: ec2hosts
-  gather_facts: False
-  become: True
-  user: ubuntu
-  pre_tasks:
-    - name: 'install python2'
-      raw: sudo apt-get -y install python-simplejson
-
-  vars:
-    region : "ap-southeast-1"
-    package_name: "apache2"
-
-  tasks:
-    - name: installing apache2.
-      apt: name="{{ package_name }}" update_cache=yes state=latest
-
-## Play 3, Creating Elastic Ips and associating with Ec2 just launched.
-- name: Play 3 Associate new elastice ips to ec2.
+## Play 2, Creating Elastic Ips and associating with Ec2 just launched.
+- name: Play 2 Associate new elastice ips to ec2.
   hosts: localhost
   #connection: local
   gather_facts: False
@@ -90,8 +72,8 @@
         instance_id: "{{ item.id }}"
       with_items: "{{ ec2.instances }}"
 
-## Play 4 Creatin ELB and attaching Ec2 ids to ELB.
-- name: Play 4 Creating ELB and attach Ec2.
+## Play 3 Creatin ELB and attaching Ec2 ids to ELB.
+- name: Play 3 Creating ELB and attach Ec2.
   hosts: localhost
   #connection: local
   gather_facts: False
@@ -101,6 +83,7 @@
     region: "ap-southeast-1"
     elb_group: "sap_elb_sec_group"
     subnet_id: "subnet-d00a65b4"
+
   tasks:
     - name: Create ELB and attache Ec2 just launched.
       local_action:
@@ -124,7 +107,7 @@
           ping_protocol: http # options are http, https, ssl, tcp
           ping_port: 80
           ping_path: "/" # not required for tcp or ssl
-          response_timeout: 5 # seconds
-          interval: 30 # seconds
-          unhealthy_threshold: 2
+          response_timeout: 30 # seconds
+          interval: 60 # seconds
+          unhealthy_threshold: 10
           healthy_threshold: 10

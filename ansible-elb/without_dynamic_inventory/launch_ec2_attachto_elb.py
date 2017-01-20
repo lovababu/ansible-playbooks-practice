@@ -72,6 +72,14 @@
     - name: installing apache2.
       apt: name="{{ package_name }}" update_cache=yes state=latest
 
+    - name: Replace index.html in /var/www/html
+      copy:
+        src: index.html
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+
+
 ## Play 3, Creating Elastic Ips and associating with Ec2 just launched.
 - name: Play 3 Associate new elastice ips to ec2.
   hosts: localhost
