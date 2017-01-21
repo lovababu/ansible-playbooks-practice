@@ -13,7 +13,7 @@ If default Python as Interpretor:
 
 If Python3 as interpretor:  
 
-```$ansible -i <inventory> all -m ping --private-key <privatekey> -u ubuntu -e 'ansible_python_interpreter=/usr/bin/python3'  
+```$ansible -i <inventory> all -m ping --private-key <privatekey> -u ubuntu -e 'ansible_python_interpreter=/usr/bin/python3' ```
  
  **before running the command update ec2_hosts.ini file accordingly**
  
