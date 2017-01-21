@@ -24,7 +24,7 @@
   
 ##Testing installation.  
   - Take ssh access of EC2 and verify the services running ($service --status-all), you must see apach2 service running.  
-  - http://<EC2 DNS name>:80/   --> Should show apache2 default page on browser.  
+  - http://EC2DNSname:80/   --> Should show apache2 default page on browser.  
   
 ##Trouble Shooting.  
   It may failed with Permission denied, wrong public key  
@@ -33,7 +33,7 @@
    - Make sure, SSH added in inbound rule of security group and you are able access through ssh.  
   It may failed during apach2 installation step.  
    - May be EC2 machine doesn't have internet access, check outbound rules.  
-  http://<EC2 DNS Name>:80/ doesn't responding even playbook run successfully.  
+  http://EC2DNSName:80/ doesn't responding even playbook run successfully.  
    - Verify inbound rule, whether HTTP with 80 port rule added or not.  
    
 
