@@ -13,9 +13,9 @@
     instance_type : "t2.micro"
     snapShot : "snap-0e4ebb7174762f159"
 
-    lc_name: "demolc"
-    asg_name: "demoasg"
-    elb_name: "demoelb"
+    lc_name: "vertxlc"
+    asg_name: "vertxasg"
+    elb_name: "vertxelb"
     elb_group: "sap_elb_sec_group"
     subnet_id: "subnet-d00a65b4"
 
@@ -41,19 +41,19 @@
             delete_on_termination: true
         #user data, it can be a shell scritp get executed once machine spin up.
         user_data: |
-                   #!/bin/bash
-                   yum update -y
-                   yum install -y httpd24
-                   service httpd start
-                   chkconfig httpd on
-                   groupadd www
-                   usermod -a -G www ec2-user
-                   chown -R root:www /var/www
-                   chmod 2775 /var/www
-                   find /var/www -type d -exec chmod 2775 {} +
-                   find /var/www -type f -exec chmod 0664 {} +
-                   OUTPUT="$(hostname -f)"
-                   echo "<h2> Response from ${OUTPUT} </h2>" > /var/www/html/index.html
+                  #!/bin/bash
+                  yum update -y
+                  yum remove java-1.7.0-openjdk -y
+                  yum install java-1.8.0-openjdk.x86_64 -y
+                  export AWS_ACCESS_KEY_ID=<changeme>
+                  export AWS_SECRET_ACCESS_KEY=<changeme>
+                  mkdir /opt/app
+                  cd /opt/app
+                  cd /opt/app
+                  aws s3 cp s3://<BucketName>/vertx-web-1-1.0.tar vertx-web-1-1.0.tar
+                  tar -xvf vertx-web-1-1.0.tar
+                  cd vertx-web-1-1.0
+                  ./bin/vertx-web-1
 
     ## Create ELB.
     - name: Creating Elastic Load Balancer.
@@ -64,7 +64,7 @@
         security_group_names:
            - "{{ elb_group }}"
         tags:
-          Name: "demo_elb"
+          Name: "Dev"
         state: present
         subnets:
           - "{{ subnet_id }}"
@@ -76,7 +76,7 @@
         health_check:
           ping_protocol: http # options are http, https, ssl, tcp
           ping_port: 80
-          ping_path: "/index.html" # not required for tcp or ssl
+          ping_path: "/" # not required for tcp or ssl
           response_timeout: 5 # seconds
           interval: 30 # seconds
           unhealthy_threshold: 2

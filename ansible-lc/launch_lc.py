@@ -22,10 +22,26 @@
         key_name: "common-ec2-keypair-2"
         security_groups: ["{{ ec2_group }}"]
         instance_type: "{{ instance_type }}"
+        instance_profile_name: "ec2role"
         image_id: "{{ ami_id }}"
         region: "{{ region }}"
         assign_public_ip: "no"
         state: "present"
+        #user data, it can be a shell scritp get executed once machine spin up.
+        user_data: |
+                  #!/bin/bash
+                  yum update -y
+                  yum remove java-1.7.0-openjdk -y
+                  yum install java-1.8.0-openjdk.x86_64 -y
+                  export AWS_ACCESS_KEY_ID=<changeme>
+                  export AWS_SECRET_ACCESS_KEY=<changeme>
+                  mkdir /opt/app
+                  cd /opt/app
+                  aws s3 cp s3://<BucketName>/vertx-web-1-1.0.tar vertx-web-1-1.0.tar
+                  tar -xvf vertx-web-1-1.0.tar
+                  cd vertx-web-1-1.0
+                  ./bin/vertx-web-1
+
         volumes:
           - device_name: /dev/sdb
             snapshot: "{{ snapShot }}"
@@ -33,10 +49,3 @@
             iops: 300
             volume_size: 10
             delete_on_termination: true
-        #user data, it can be a shell scritp get executed once machine spin up.
-        user_data: |
-                   #!/bin/bash 
-                   sudo apt-get update 
-                   sudo apt-get install apache2 
-                   hostname=$(hostname -f) 
-                   echo '<h3>I am the instance $hostname</h3>' > /var/www/html/index.html
