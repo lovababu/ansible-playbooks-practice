@@ -30,8 +30,5 @@
    - May be EC2 machine doesn't have internet access, check outbound rules.  
   http://EC2DNSName:80/ doesn't responding even playbook run successfully.  
    - Verify inbound rule, whether HTTP with 80 port rule added or not.  
-   
-
-
  
  

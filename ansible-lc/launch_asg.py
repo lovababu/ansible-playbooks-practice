@@ -45,12 +45,12 @@
                   yum update -y
                   yum remove java-1.7.0-openjdk -y
                   yum install java-1.8.0-openjdk.x86_64 -y
-                  export AWS_ACCESS_KEY_ID=<changeme>
-                  export AWS_SECRET_ACCESS_KEY=<changeme>
+                  export AWS_ACCESS_KEY_ID=<ChangeMe>
+                  export AWS_SECRET_ACCESS_KEY=<ChangeMe>
                   mkdir /opt/app
                   cd /opt/app
                   cd /opt/app
-                  aws s3 cp s3://<BucketName>/vertx-web-1-1.0.tar vertx-web-1-1.0.tar
+                  aws s3 cp s3://avol-deliverables/vertx-web-1-1.0.tar vertx-web-1-1.0.tar
                   tar -xvf vertx-web-1-1.0.tar
                   cd vertx-web-1-1.0
                   ./bin/vertx-web-1

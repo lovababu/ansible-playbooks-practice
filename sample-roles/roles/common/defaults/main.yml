@@ -1,0 +1,7 @@
+---
+# default variables can be declared here.
+
+nodejs_version: 6.x
+java_version: 8
+ubuntu_java_installer: oracle-java{{ java_version }}-installer
+ubuntu_java_set_default: oracle-java{{ java_version }}-set-default

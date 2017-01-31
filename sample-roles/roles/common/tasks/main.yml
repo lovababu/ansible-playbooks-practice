@@ -1,0 +1,67 @@
+---
+# tasks file for web
+
+## Installing  python-simplejson, it require for ubuntu > 15.0
+- name: 'Install python2 as pre task'
+  raw: sudo apt-get -y install python-simplejson
+  
+- name: gathering host facts
+  setup:
+  register: vmfacts
+
+## Installing Node JS package.
+- name: Ensure apt-transport-https is installed.
+  apt: name=apt-transport-https state=present
+  tags: nodejs
+
+- name: Add Nodesource apt key.
+  apt_key:
+    url: https://keyserver.ubuntu.com/pks/lookup?op=get&fingerprint=on&search=0x1655A0AB68576280
+    id: "68576280"
+    state: present
+  tags: nodejs
+
+- name: Add NodeSource repositories for Node.js.
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+  with_items:
+    - "deb https://deb.nodesource.com/node_{{ nodejs_version }} {{ ansible_distribution_release }} main"
+    - "deb-src https://deb.nodesource.com/node_{{ nodejs_version }} {{ ansible_distribution_release }} main"
+  register: node_repo
+  tags: nodejs
+
+- name: Update apt cache if repo was added.
+  apt: update_cache=yes
+  when: node_repo.changed
+  tags: nodejs
+
+- name: Ensure Node.js and npm are installed.
+  apt: "name=nodejs={{ nodejs_version|regex_replace('x', '') }}* state=present"
+  tags: nodejs
+
+
+## Installing JDK.
+- name: Install add-apt-repostory
+  become: yes
+  apt: name=software-properties-common state=latest
+  tags: java
+
+- name: Add Oracle Java Repository
+  become: yes
+  apt_repository: repo='ppa:webupd8team/java'
+  tags: java
+
+- name: Accept Java 8 License
+  become: yes
+  debconf: name="{{ ubuntu_java_installer }}" question='shared/accepted-oracle-license-v1-1' value='true' vtype='select'
+  tags: java
+
+- name: Install Oracle Java 8
+  become: yes
+  apt: name="{{item}}" state=latest
+  with_items:
+    - "{{ ubuntu_java_installer }}"
+    - ca-certificates
+    - "{{ ubuntu_java_set_default }}"
+  tags: java

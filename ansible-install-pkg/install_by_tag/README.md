@@ -29,12 +29,18 @@
 ##Trouble Shooting.  
   It may failed with Permission denied, wrong public key  
    - Make sure you are using same key, was used to create EC2.  
+
   It may failed wit connection timed out.  
    - Make sure, SSH added in inbound rule of security group and you are able access through ssh.  
+
   It may failed during apach2 installation step.  
    - May be EC2 machine doesn't have internet access, check outbound rules.  
+
   http://EC2DNSName:80/ doesn't responding even playbook run successfully.  
    - Verify inbound rule, whether HTTP with 80 port rule added or not.  
+
+  If play is failing to update cache on slave.  
+   - Remove ```update_cache=yes``` and retry.  
    
 
 

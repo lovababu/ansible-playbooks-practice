@@ -7,16 +7,16 @@
   vars:
     ami_id : "ami-06963965"
     region : "ap-southeast-1"
-    ec2_group : "sap_ec2_sec_group"
-    elb_group : "sap_elb_sec_group"
+    ec2_group : "sap_ec2_sec_group" 
     instance_type : "t2.micro" 
+    key_pair: "common-ec2-keypair-2" 
 
   tasks:
 
     - name: Provisioning exactly one instance
       local_action:
         module: ec2
-        key_name: "common-ec2-keypair"
+        key_name: "{{ key_pair }}"
         group: "{{ ec2_group }}"
         instance_type: "{{ instance_type }}"
         image: "{{ ami_id }}"
